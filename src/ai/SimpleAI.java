@@ -77,8 +77,8 @@ public class SimpleAI implements AI {
 				// Spieler steht bereits auf Schatz, z.B. wenn herausgeschoben
 				// TODO Random Shift
 				
-				int index = 2 * (rand.nextInt() % 3) + 1;
-				int side = rand.nextInt(2);
+				int index = 2 * (rand.nextInt() % 3) + 1; //->1,3,5
+				int side = rand.nextInt(4);  // ->0,1,2,3
 				
 				int col = -1;
 				int row = -1;
@@ -155,7 +155,7 @@ public class SimpleAI implements AI {
 		move.setShiftCard(doShift(board, shiftPosition));
 		
 		if(!board.validateTransition(move, playerID)) {
-			System.out.println("Oops da klappt was nicht");
+			System.out.println("Oops, da klappt was nicht");
 		}
 		
 		return move;
