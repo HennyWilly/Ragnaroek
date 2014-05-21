@@ -1,8 +1,8 @@
 package client;
 
 import generated.BoardType;
-
 import generated.CardType;
+import generated.BoardType.Row;
 import generated.CardType.Openings;
 import generated.CardType.Pin;
 import generated.MoveMessageType;
@@ -89,7 +89,7 @@ public class Board extends BoardType {
 		if (!shiftCard.getPin().getPlayerID().isEmpty()) {
 			//Figur zwischenspeichern
 			Pin temp = shiftCard.getPin();
-			//Figur auf SchiebeKarte löschen
+			//Figur auf SchiebeKarte loeschen
 			shiftCard.setPin(new Pin());
 			//Zwischengespeicherte Figut auf
 			//neuer Karte plazieren
@@ -100,7 +100,7 @@ public class Board extends BoardType {
 
 	// gibt zurueck ob mit dem Zug der aktuelle Schatz erreicht wurde
 	public boolean proceedTurn(MoveMessageType move, Integer currPlayer) {
-		// XXX ACHTUNG wird nicht mehr auf Richtigkeit überprüft!!!
+		// XXX ACHTUNG wird nicht mehr auf Richtigkeit ueberprueft!!!
 		this.proceedShift(move);
 		Position target = new Position(move.getNewPinPos());
 		movePlayer(findPlayer(currPlayer), target, currPlayer);
@@ -146,7 +146,7 @@ public class Board extends BoardType {
 		}
 		Card sc = new Card(move.getShiftCard());
 		if (!sc.equals(shiftCard)) {
-			System.err.println("Warning: Schiebekarte wurde illegal verändert");
+			System.err.println("Warning: Schiebekarte wurde illegal veraendert");
 			return false;
 		}
 		// Ueberpruefen ob der Spielzug gueltig ist
@@ -251,5 +251,31 @@ public class Board extends BoardType {
 
 	public TreasureType getTreasure() {
 		return currentTreasure;
+	}
+	
+	public PositionType getTreasurePos() {
+		List<Row> rows = getRow();
+		List<CardType> cols;
+		Row row;
+		CardType card;
+		TreasureType cardTreasure;
+		PositionType position;
+		
+		for(int i = 0; i < rows.size(); i++) {
+			row = rows.get(i);
+			cols = row.getCol();
+			for(int j = 0; j < cols.size(); j++) {
+				card = cols.get(j);
+				cardTreasure = card.getTreasure();
+				if(cardTreasure != null && cardTreasure.equals(currentTreasure)) {
+					position =  new PositionType();
+					position.setCol(j);
+					position.setRow(i);
+					return position;
+				}
+			}
+		}
+		
+		return null;
 	}
 }

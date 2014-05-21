@@ -1,10 +1,10 @@
 package ai;
 
+import java.util.List;
 import java.util.Random;
 
 import client.Board;
 import client.Card;
-
 import generated.AwaitMoveMessageType;
 import generated.BoardType;
 import generated.CardType;
@@ -18,24 +18,6 @@ public class SimpleAI implements AI {
 	
 	static {
 		rand = new Random();
-	}
-	
-	private PositionType getTreasurePos(BoardType board, TreasureType treasure) {
-		for(int i = 0; i < board.getRow().size(); i++) {
-			Row row = board.getRow().get(i);
-			for(int j = 0; j < row.getCol().size(); j++) {
-				CardType card = row.getCol().get(j);
-				TreasureType cardTreasure = card.getTreasure();
-				if(cardTreasure != null && cardTreasure.equals(treasure)) {
-					PositionType position =  new PositionType();
-					position.setCol(j);
-					position.setRow(i);
-					return position;
-				}
-			}
-		}
-		
-		return null;
 	}
 	
 	private CardType doShift(BoardType board, PositionType shift) {
@@ -70,24 +52,24 @@ public class SimpleAI implements AI {
 		Card shiftCard = new Card(board.getShiftCard());
 		PositionType playerPos = board.findPlayer(playerID);
 
-		//TODO Mit Werten füllen
+		//TODO Mit Werten fuellen
 		PositionType newPinPos = new PositionType();
 		PositionType shiftPosition = new PositionType();
 		
 		if(board.getTreasure() == null) {
 			// Keine Karte mehr auf dem Stapel des Spielers
 			// => Alle Karten gesammelt
-			// TODO Nun zum Startpunkt zurückkehren
+			// TODO Nun zum Startpunkt zurueckkehren
 		}
 	
 		if(shiftCard.getTreasure() != null && 
 				shiftCard.getTreasure().equals(board.getTreasure())) {
 			// Schatz auf Shift-Karte
-			// TODO Schiebe auf nächst mögliches Feld
+			// TODO Schiebe auf naechst moegliches Feld
 		}
 		else {
 			// Schatz auf dem Spielfeld
-			PositionType wantedCardPos = getTreasurePos(board, board.getTreasure());
+			PositionType wantedCardPos = board.getTreasurePos();
 			if(playerPos.equals(wantedCardPos)) {
 				// Spieler steht bereits auf Schatz, z.B. wenn herausgeschoben
 				// TODO Random Shift
@@ -132,7 +114,7 @@ public class SimpleAI implements AI {
 					
 				}
 				else {
-					// TODO Shift, dass wenn möglich ein Weg erzeugt wird
+					// TODO Shift, dass wenn moeglich ein Weg erzeugt wird
 				}
 			}
 		}
