@@ -117,7 +117,7 @@ public class Board extends BoardType {
 				.add(playerID);
 	}
 
-	protected Board fakeShift(MoveMessageType move) {
+	public Board fakeShift(MoveMessageType move) {
 		Board fake = (Board) this.clone();
 		fake.proceedShift(move);
 		return fake;

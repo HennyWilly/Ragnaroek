@@ -51,6 +51,9 @@ public class SimpleAI implements AI {
 		Board board = new Board(data.getBoard(), data.getTreasure());
 		Card shiftCard = new Card(board.getShiftCard());
 		PositionType playerPos = board.findPlayer(playerID);
+		PositionType forbiddenPos = board.getForbidden();
+		
+		Board shadowBoard = (Board) board.clone();
 
 		//TODO Mit Werten fuellen
 		PositionType newPinPos = new PositionType();
@@ -101,6 +104,7 @@ public class SimpleAI implements AI {
 				shiftPosition.setCol(col);
 				shiftPosition.setRow(row);
 				
+				//TODO
 				newPinPos = playerPos;
 			}
 			else {
@@ -115,6 +119,32 @@ public class SimpleAI implements AI {
 				}
 				else {
 					// TODO Shift, dass wenn moeglich ein Weg erzeugt wird
+					//probing
+					int index = 2 * (rand.nextInt() % 3) + 1;
+					int side = rand.nextInt(2);
+					
+					int col = -1;
+					int row = -1;
+					switch(side) {
+					case 0:		//Oben
+						row = 0;
+						col = index;
+						break;
+					case 1:		//Rechts
+						row = index;
+						col = 6;
+						break;
+					case 2:		//Unten
+						row = 6;
+						col = index;
+						break;
+					case 3: 	//Links
+						row = index;
+						col = 0;
+						break;
+					}
+					
+					
 				}
 			}
 		}
