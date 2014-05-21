@@ -125,7 +125,7 @@ public class SimpleAI implements AI {
 		move.setShiftCard(doShift(board, shiftPosition));
 		
 		if(!board.validateTransition(move, playerID)) {
-			System.out.println("Oops da klappt was nicht");
+			System.out.println("Oops, da klappt was nicht");
 		}
 		
 		return move;
