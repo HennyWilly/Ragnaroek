@@ -2,7 +2,6 @@ package client;
 
 import generated.BoardType;
 import generated.CardType;
-import generated.BoardType.Row;
 import generated.CardType.Openings;
 import generated.CardType.Pin;
 import generated.MoveMessageType;

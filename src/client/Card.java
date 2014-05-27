@@ -224,7 +224,17 @@ public class Card extends CardType {
 		default:
 			return null;					
 		}
-		
 	}
 
+	public void rotateClockwise() {
+		Openings openings = getOpenings();
+		Openings rotated = new Openings();
+		
+		rotated.setBottom(openings.isRight());
+		rotated.setLeft(openings.isBottom());
+		rotated.setTop(openings.isLeft());
+		rotated.setRight(openings.isTop());
+		
+		setOpenings(rotated);
+	}
 }

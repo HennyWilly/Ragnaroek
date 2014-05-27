@@ -86,8 +86,8 @@ public class Game {
 				}
 			}
 			else if(msg.getMcType() == MazeComType.DISCONNECT) {
-				// Zu viele Versuche
-				// TODO Fehlerbehandlung
+				System.out.println("Die Verbindung wurde Serverseitig beendet.");
+				System.out.format("Grund: %s\n", msg.getDisconnectMessage().getErroCode());
 				
 				return false;
 			}

@@ -59,12 +59,16 @@ public class Position extends PositionType {
 			return true;
 		if (obj == null)
 			return false;
+		
+		if(!PositionType.class.isAssignableFrom(obj.getClass()))
+			return false;
+		
 		Position other = new Position((PositionType) obj);
-		if (col != other.col)
-			return false;
-		if (row != other.row)
-			return false;
-		return true;
+		return row == other.row && 
+				col == other.col;
 	}
 
+	public String toString() {
+		return String.format("row = %d; col = %d", this.row, this.col);
+	}
 }
