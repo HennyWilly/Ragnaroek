@@ -145,7 +145,7 @@ public class SimpleAI implements AI {
 							}
 						}
 
-						// TODO More inteligent way to rotate
+						// TODO More intelligent way to rotate
 						shiftCard.rotateClockwise();
 					}
 				}
@@ -165,7 +165,7 @@ public class SimpleAI implements AI {
 	 * shift-positions until it finds an appropriate one that either creates a
 	 * viable path to the treasure or preserves an already existing one. If
 	 * there is no valid path, the algorithm tries to find a path to the closest
-	 * neighbour of the treasure. In case of the scenario being without a
+	 * neighbor of the treasure. In case of the scenario being without a
 	 * solution, the method returns a random position.
 	 * 
 	 * @param board
@@ -176,7 +176,7 @@ public class SimpleAI implements AI {
 	 *            current wanted card position
 	 * @return a shift-position that either creates a viable path to the
 	 *         treasure or preserves an already existing one in case of
-	 *         solvability
+	 *         solveability
 	 */
 	private MoveMessageType getAppropriateMove(Board board, int playerID,
 			PositionType playerPos) {
@@ -199,7 +199,7 @@ public class SimpleAI implements AI {
 						if (probeShiftPos.equals(forbiddenPos))
 							continue;
 
-						// FIXME Stil buggy
+						// FIXME Still buggy
 						message = getAppropriateRadiusMove(board, playerID,
 								playerPos, probeShiftPos, radius, radius);
 						break outer;
@@ -233,7 +233,6 @@ public class SimpleAI implements AI {
 	public MoveMessageType move(int playerID, AwaitMoveMessageType data) {
 		Board board = new Board(data.getBoard(), data.getTreasure());
 		PositionType playerPos = board.findPlayer(playerID);
-
 		MoveMessageType move = this.getAppropriateMove(board, playerID,
 				playerPos);
 		if (!board.validateTransition(move, playerID)) {
