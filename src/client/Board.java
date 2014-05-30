@@ -121,6 +121,15 @@ public class Board extends BoardType {
 		fake.proceedShift(move);
 		return fake;
 	}
+	
+	public Board fakeShift(PositionType shiftPos, CardType shiftCard) {
+		MoveMessageType move = new MoveMessageType();
+		
+		move.setShiftCard(shiftCard);
+		move.setShiftPosition(shiftPos);
+		
+		return fakeShift(move);
+	}
 
 	@Override
 	public Object clone() {
@@ -229,13 +238,13 @@ public class Board extends BoardType {
 		return positionen;
 	}
 
-	public PositionType findPlayer(Integer PlayerID) {
+	public Position findPlayer(Integer PlayerID) {
 		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 7; j++) {
 				Pin pinsOnCard = getCard(i, j).getPin();
 				for (Integer pin : pinsOnCard.getPlayerID()) {
 					if (pin == PlayerID) {
-						PositionType pos = new PositionType();
+						Position pos = new Position();
 						pos.setCol(j);
 						pos.setRow(i);
 						return pos;
@@ -276,5 +285,30 @@ public class Board extends BoardType {
 		}
 		
 		return null;
+	}
+	
+	public boolean equals(Object other) {
+		if(this == other)
+			return true;
+		if(other == null)
+			return false;
+		
+		if(!BoardType.class.isAssignableFrom(other.getClass())) 
+			return false;
+		
+		Board board = (Board) other;
+		if(!this.getShiftCard().equals(board.getShiftCard()) || 
+				!this.getTreasure().equals(board.getTreasure()) || 
+				!this.getTreasurePos().equals(board.getTreasurePos()))
+			return false;
+		
+		for(int i = 0; i < getRow().size(); i++) {
+			for(int j = 0; j < getRow().get(i).getCol().size(); j++) {
+				if(!this.getCard(i, j).equals(board.getCard(i, j)))
+					return false;
+			}
+		}
+		
+		return true;
 	}
 }

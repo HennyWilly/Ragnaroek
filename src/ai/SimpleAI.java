@@ -54,52 +54,6 @@ public class SimpleAI implements AI {
 		return positions.toArray(new Position[positions.size()]);
 	}
 
-	/**
-	 * Returns a valid position which represents a shiftable position on the
-	 * board on the specified side.
-	 * 
-	 * @param index
-	 *            column or rowindex on the board depending on the specified
-	 *            side
-	 * @param side
-	 *            0 = Top; 1 = Left; 2 = Bottom; 3 = Right
-	 * @return a valid shift-position to be directly used in the calculations
-	 */
-	private Position getValidShiftPos(int index, int side) {
-		if (index < 0 || index > 6 || index % 2 == 0)
-			throw new IllegalArgumentException("Invalid index to insert.");
-
-		if (side < 0 || side >= 4)
-			throw new IllegalArgumentException("Invalid side of board");
-
-		Position probeShiftPos = new Position();
-
-		switch (side) {
-		// Top
-		case 0:
-			probeShiftPos.setCol(index);
-			probeShiftPos.setRow(0);
-			break;
-		// Left
-		case 1:
-			probeShiftPos.setCol(0);
-			probeShiftPos.setRow(index);
-			break;
-		// Bottom
-		case 2:
-			probeShiftPos.setCol(index);
-			probeShiftPos.setRow(6);
-			break;
-		// Right
-		case 3:
-			probeShiftPos.setCol(6);
-			probeShiftPos.setRow(index);
-			break;
-		}
-
-		return probeShiftPos;
-	}
-
 	private MoveMessageType getAppropriateRadiusMove(Board board, int playerID,
 			PositionType playerPos, PositionType targetPos, int radius,
 			int maxRadius) {
@@ -124,12 +78,12 @@ public class SimpleAI implements AI {
 
 			for (int i = 1; i < 6; i += 2) {
 				for (int j = 0; j < 4; j++) {
-					probeShiftPos = getValidShiftPos(i, j);
+					probeShiftPos = Position.getValidShiftPos(i, j);
 
 					if (probeShiftPos.equals(forbiddenPos))
 						continue;
 
-					for (int k = 0; k < 4; k++) {
+					for (int k = 0; k < shiftCard.getDifferentRotationCount(); k++) {					
 						move.setShiftPosition(probeShiftPos);
 						move.setNewPinPos(wanted);
 						move.setShiftCard(shiftCard);
@@ -145,8 +99,7 @@ public class SimpleAI implements AI {
 							}
 						}
 
-						// TODO More intelligent way to rotate
-						shiftCard.rotateClockwise();
+						shiftCard = shiftCard.rotateClockwise();
 					}
 				}
 			}
@@ -194,7 +147,7 @@ public class SimpleAI implements AI {
 				Position probeShiftPos = null;
 				for (int i = 1; i < 6; i += 2) {
 					for (int j = 0; j < 4; j++) {
-						probeShiftPos = getValidShiftPos(i, j);
+						probeShiftPos = Position.getValidShiftPos(i, j);
 
 						if (probeShiftPos.equals(forbiddenPos))
 							continue;
@@ -220,7 +173,7 @@ public class SimpleAI implements AI {
 				index = 2 * rand.nextInt(3) + 1; // ->1,3,5
 				side = rand.nextInt(4); // ->0,1,2,3
 
-				message.setShiftPosition(getValidShiftPos(index, side));
+				message.setShiftPosition(Position.getValidShiftPos(index, side));
 			} while (message.getShiftPosition().equals(forbiddenPos));
 			message.setNewPinPos(playerPos);
 			message.setShiftCard(board.getShiftCard());

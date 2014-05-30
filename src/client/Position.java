@@ -63,12 +63,58 @@ public class Position extends PositionType {
 		if(!PositionType.class.isAssignableFrom(obj.getClass()))
 			return false;
 		
-		Position other = new Position((PositionType) obj);
-		return row == other.row && 
-				col == other.col;
+		PositionType other = (PositionType) obj;
+		return row == other.getRow() && 
+				col == other.getCol();
 	}
 
 	public String toString() {
 		return String.format("row = %d; col = %d", this.row, this.col);
+	}
+
+	/**
+	 * Returns a valid position which represents a shiftable position on the
+	 * board on the specified side.
+	 * 
+	 * @param index
+	 *            column or rowindex on the board depending on the specified
+	 *            side
+	 * @param side
+	 *            0 = Top; 1 = Left; 2 = Bottom; 3 = Right
+	 * @return a valid shift-position to be directly used in the calculations
+	 */
+	public static Position getValidShiftPos(int index, int side) {
+		if (index < 0 || index > 6 || index % 2 == 0)
+			throw new IllegalArgumentException("Invalid index to insert.");
+
+		if (side < 0 || side >= 4)
+			throw new IllegalArgumentException("Invalid side of board");
+
+		Position probeShiftPos = new Position();
+
+		switch (side) {
+		// Top
+		case 0:
+			probeShiftPos.setCol(index);
+			probeShiftPos.setRow(0);
+			break;
+		// Left
+		case 1:
+			probeShiftPos.setCol(0);
+			probeShiftPos.setRow(index);
+			break;
+		// Bottom
+		case 2:
+			probeShiftPos.setCol(index);
+			probeShiftPos.setRow(6);
+			break;
+		// Right
+		case 3:
+			probeShiftPos.setCol(6);
+			probeShiftPos.setRow(index);
+			break;
+		}
+
+		return probeShiftPos;
 	}
 }

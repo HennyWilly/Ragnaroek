@@ -42,11 +42,9 @@ public class Card extends CardType {
 		this.getOpenings().setTop(c.getOpenings().isTop());
 
 		this.setTreasure(c.getTreasure());
-		this.setPin(new Pin());
-		if(c.getPin()!=null){
+		if (c.getPin() != null) {
+			this.setPin(new Pin());
 			this.pin.getPlayerID().addAll(c.getPin().getPlayerID());
-		}else{
-			this.setPin(null);
 		}
 	}
 
@@ -162,7 +160,7 @@ public class Card extends CardType {
 				return false;
 			}
 		}
-		if(other.getShape()!=this.getShape()){
+		if (other.getShape() != this.getShape()) {
 			return false;
 		}
 		return true;
@@ -192,49 +190,57 @@ public class Card extends CardType {
 			return CardShape.T;
 		}
 	}
-	
-	public Orientation getOrientation(){
-		switch(getShape()){
+
+	public Orientation getOrientation() {
+		switch (getShape()) {
 		case I:
-			if(getOpenings().isTop()){
+			if (getOpenings().isTop()) {
 				return Orientation.D0;
-			}else{
+			} else {
 				return Orientation.D90;
 			}
 		case L:
-			if(getOpenings().isTop() && getOpenings().isRight()){
+			if (getOpenings().isTop() && getOpenings().isRight()) {
 				return Orientation.D0;
-			}else if(getOpenings().isRight() && getOpenings().isBottom()){
+			} else if (getOpenings().isRight() && getOpenings().isBottom()) {
 				return Orientation.D90;
-			}else if(getOpenings().isBottom() && getOpenings().isLeft()){
+			} else if (getOpenings().isBottom() && getOpenings().isLeft()) {
 				return Orientation.D180;
-			}else { //if(getOpenings().isLeft() && getOpenings().isTop()){
+			} else { // if(getOpenings().isLeft() && getOpenings().isTop()){
 				return Orientation.D270;
 			}
 		case T:
-			if(!getOpenings().isTop()){
+			if (!getOpenings().isTop()) {
 				return Orientation.D0;
-			}else if(!getOpenings().isRight()){
+			} else if (!getOpenings().isRight()) {
 				return Orientation.D90;
-			}else if(!getOpenings().isBottom()){
+			} else if (!getOpenings().isBottom()) {
 				return Orientation.D180;
-			}else {//if(!getOpenings().isLeft()){
+			} else {// if(!getOpenings().isLeft()){
 				return Orientation.D270;
 			}
 		default:
-			return null;					
+			return null;
 		}
 	}
 
-	public void rotateClockwise() {
-		Openings openings = getOpenings();
-		Openings rotated = new Openings();
-		
-		rotated.setBottom(openings.isRight());
-		rotated.setLeft(openings.isBottom());
-		rotated.setTop(openings.isLeft());
-		rotated.setRight(openings.isTop());
-		
-		setOpenings(rotated);
+	public Card rotateClockwise() {
+		Orientation current = getOrientation();
+		Orientation rotated = Orientation.fromValue((current.value + 90) % 360);
+
+		return new Card(getShape(), rotated, getTreasure());
+	}
+	
+	public int getDifferentRotationCount() {
+		switch(this.getShape()) {
+		case I:
+			return 2;
+		case L:
+			return 4;
+		case T:
+			return 4;
+		default:
+			throw new UnsupportedOperationException();
+		}
 	}
 }
