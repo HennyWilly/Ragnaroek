@@ -3,11 +3,14 @@ package client;
 import java.io.IOException;
 import java.net.Socket;
 
+import ai.AI;
 import ai.SimpleAI;
 
 public class Main {
+	public static final String NAME = "Ragnarök";
+
 	/**
-	 * Parst die übergebenen Argumente und gibt, falls erfolgreich, einen Socket
+	 * Parst die uebergebenen Argumente und gibt, falls erfolgreich, einen Socket
 	 * zum Server zurück
 	 * 
 	 * @param args
@@ -24,7 +27,7 @@ public class Main {
 					throw new NumberFormatException();
 				}
 			} catch (NumberFormatException ex) {
-				System.out.format("%s ist kein gültiger Port\n", args[1]);
+				System.out.format("%s ist kein gueltiger Port\n", args[1]);
 				return null;
 			}
 
@@ -32,9 +35,9 @@ public class Main {
 			try {
 				sock = new Socket(host, port);
 			} catch (IOException e) {
-				System.out.format(
-						"Verbindung zu %s:%d konnte nicht hergestellt werden\n",
-						host, port);
+				System.out
+						.format("Verbindung zu %s:%d konnte nicht hergestellt werden\n",
+								host, port);
 			}
 			return sock;
 		}
@@ -47,7 +50,8 @@ public class Main {
 	 * Gibt den Typ der benötigten Kommandozeilenparameter auf der Konsole aus.
 	 */
 	private static void showHelp() {
-		System.out.println("Es werden genau 2 Kommandozeilenargumente benötigt");
+		System.out
+				.println("Es werden genau 2 Kommandozeilenargumente benoetigt");
 		System.out.println("Hostname: Name oder IP-Adresse des Servers");
 		System.out.println("Port: Portnummer die vom Server überwacht wird");
 	}
@@ -65,8 +69,12 @@ public class Main {
 		if (sock == null)
 			return;
 
-		Game game = new Game("Ragnarök", sock);
-		if(game.solve(new SimpleAI()))
+		AI solver = new SimpleAI();
+		String name = String.format("%s.%s", NAME, solver.getClass()
+				.getSimpleName());
+
+		Game game = new Game(name, sock);
+		if (game.solve(solver))
 			System.out.println("Congratz");
 	}
 }

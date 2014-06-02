@@ -19,81 +19,88 @@ public class Game {
 	private MazeComMessageFactory factory;
 	private Connection connection;
 	private int clientID;
-	
+
 	public Game(String name, Socket sock) throws IOException {
 		factory = new MazeComMessageFactory();
 		connection = new Connection(sock);
-		
+
 		MazeCom antwort = sendMessage(factory.createLoginMessage(name));
-		switch(antwort.getMcType()) {
-		case ACCEPT:		//Falsche Nachricht
-							// TODO Fehlerbehandlung
+		switch (antwort.getMcType()) {
+		case ACCEPT: // Falsche Nachricht
+						// TODO Fehlerbehandlung
 			break;
-		case DISCONNECT:	//Zu viele Login-Versuche
+		case DISCONNECT: // Zu viele Login-Versuche
 							// TODO Fehlerbehandlung
 			break;
 		case LOGINREPLY:
 			clientID = antwort.getLoginReplyMessage().getNewID();
 			break;
-		default:			//Unerwartete Nachricht
-							// TODO Fehlerbehandlung
+		default: // Unerwartete Nachricht
+					// TODO Fehlerbehandlung
 			break;
 		}
 	}
-	
+
 	public Game(String name, String host, int port) throws IOException {
 		this(name, new Socket(host, port));
 	}
-	
+
 	private MazeCom sendMessage(MazeCom message) {
 		connection.sendMessage(message);
 		return connection.receiveMessage();
 	}
-	
+
 	public boolean solve(AI solver) {
 		MazeCom msg = null;
-		
+
 		do {
 			msg = connection.receiveMessage();
-			if(msg.getMcType() == MazeComType.AWAITMOVE) {
-				//Speichere Daten des Spielfeldes
+			if (msg.getMcType() == MazeComType.AWAITMOVE) {
+				// Speichere Daten des Spielfeldes
 				AwaitMoveMessageType awaitMove = msg.getAwaitMoveMessage();
-				
-				//Errechne Zug aus Spielfeld-Daten
+
+				// Errechne Zug aus Spielfeld-Daten
 				MoveMessageType move = solver.move(clientID, awaitMove);
-				
-				MazeCom result = sendMessage(factory.createMoveMessage(clientID, move));
-				if(result == null) {
+
+				// TODO remove dummy check
+				Board board = new Board(awaitMove.getBoard(),
+						awaitMove.getTreasure());
+				if (!board.validateTransition(move, clientID)) {
+					System.out.println("Oops, da klappt was nicht");
+				}
+
+				MazeCom result = sendMessage(factory.createMoveMessage(
+						clientID, move));
+				if (result == null) {
 					System.err.println("Verbindung zum Server unterbrochen");
 					return false;
 				}
-				
+
 				MazeComType type = result.getMcType();
-				if(type == MazeComType.ACCEPT && !result.getAcceptMessage().isAccept()) {
+				if (type == MazeComType.ACCEPT
+						&& !result.getAcceptMessage().isAccept()) {
 					ErrorType error = result.getAcceptMessage().getErrorCode();
-					if(error == ErrorType.AWAIT_MOVE) {
+					if (error == ErrorType.AWAIT_MOVE) {
 						// Falsche Nachricht gesendet
 						// TODO Fehlerbehandlung
-					}
-					else if(error == ErrorType.ILLEGAL_MOVE) {
+					} else if (error == ErrorType.ILLEGAL_MOVE) {
 						// Inkorrekter Zug
 						// TODO Fehlerbehandlung
 					}
-				}
-				else if(type == MazeComType.DISCONNECT) {
+				} else if (type == MazeComType.DISCONNECT) {
 					// Zu viele Versuche
 					// TODO Fehlerbehandlung
 				}
-			}
-			else if(msg.getMcType() == MazeComType.DISCONNECT) {
-				System.out.println("Die Verbindung wurde Serverseitig beendet.");
-				System.out.format("Grund: %s\n", msg.getDisconnectMessage().getErroCode());
-				
+			} else if (msg.getMcType() == MazeComType.DISCONNECT) {
+				System.out
+						.println("Die Verbindung wurde Serverseitig beendet.");
+				System.out.format("Grund: %s\n", msg.getDisconnectMessage()
+						.getErroCode());
+
 				return false;
 			}
-		}
-		while(msg.getMcType() != MazeComType.WIN);
-		
+		} while (msg.getMcType() != MazeComType.WIN);
+
 		WinMessageType winMessage = msg.getWinMessage();
 		return winMessage.getWinner().getId() == clientID;
 	}

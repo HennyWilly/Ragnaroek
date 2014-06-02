@@ -41,7 +41,7 @@ public class Board extends BoardType {
 
 	// Fuehrt nur das Hereinschieben der Karte aus!!!
 	protected void proceedShift(MoveMessageType move) {
-		Position sm =new Position( move.getShiftPosition() );
+		Position sm = new Position(move.getShiftPosition());
 		if (sm.getCol() % 6 == 0) { // Col=6 oder 0
 			if (sm.getRow() % 2 == 1) {
 				// horizontal schieben
@@ -79,20 +79,20 @@ public class Board extends BoardType {
 
 			}
 		}
-		forbidden=sm.getOpposite();
+		forbidden = sm.getOpposite();
 		Card c = new Card(move.getShiftCard());
 		// Wenn Spielfigur auf neuer shiftcard steht,
 		// muss dieser wieder aufs Brett gesetzt werden
 		// Dazu wird Sie auf die gerade hereingeschoben
 		// Karte gesetzt
 		if (!shiftCard.getPin().getPlayerID().isEmpty()) {
-			//Figur zwischenspeichern
+			// Figur zwischenspeichern
 			Pin temp = shiftCard.getPin();
-			//Figur auf SchiebeKarte loeschen
+			// Figur auf SchiebeKarte loeschen
 			shiftCard.setPin(new Pin());
-			//Zwischengespeicherte Figut auf
-			//neuer Karte plazieren
-			c.setPin(temp);			
+			// Zwischengespeicherte Figut auf
+			// neuer Karte plazieren
+			c.setPin(temp);
 		}
 		setCard(sm.getRow(), sm.getCol(), c);
 	}
@@ -121,13 +121,13 @@ public class Board extends BoardType {
 		fake.proceedShift(move);
 		return fake;
 	}
-	
+
 	public Board fakeShift(PositionType shiftPos, CardType shiftCard) {
 		MoveMessageType move = new MoveMessageType();
-		
+
 		move.setShiftCard(shiftCard);
 		move.setShiftPosition(shiftPos);
-		
+
 		return fakeShift(move);
 	}
 
@@ -154,7 +154,8 @@ public class Board extends BoardType {
 		}
 		Card sc = new Card(move.getShiftCard());
 		if (!sc.equals(shiftCard)) {
-			System.err.println("Warning: Schiebekarte wurde illegal veraendert");
+			System.err
+					.println("Warning: Schiebekarte wurde illegal veraendert");
 			return false;
 		}
 		// Ueberpruefen ob der Spielzug gueltig ist
@@ -171,8 +172,7 @@ public class Board extends BoardType {
 		return getAlleEreichbarenNachbarn(oldP).contains(newP);
 	}
 
-	public List<Position> getAlleEreichbarenNachbarn(
-			Position position) {
+	public List<Position> getAlleEreichbarenNachbarn(Position position) {
 		List<Position> erreichbarePositionen = new ArrayList<Position>();
 		int[][] erreichbar = new int[7][7];
 		erreichbar[position.getRow()][position.getCol()] = 1;
@@ -260,7 +260,7 @@ public class Board extends BoardType {
 	public TreasureType getTreasure() {
 		return currentTreasure;
 	}
-	
+
 	public PositionType getTreasurePos() {
 		List<Row> rows = getRow();
 		List<CardType> cols;
@@ -268,47 +268,48 @@ public class Board extends BoardType {
 		CardType card;
 		TreasureType cardTreasure;
 		PositionType position;
-		
-		for(int i = 0; i < rows.size(); i++) {
+
+		for (int i = 0; i < rows.size(); i++) {
 			row = rows.get(i);
 			cols = row.getCol();
-			for(int j = 0; j < cols.size(); j++) {
+			for (int j = 0; j < cols.size(); j++) {
 				card = cols.get(j);
 				cardTreasure = card.getTreasure();
-				if(cardTreasure != null && cardTreasure.equals(currentTreasure)) {
-					position =  new PositionType();
+				if (cardTreasure != null
+						&& cardTreasure.equals(currentTreasure)) {
+					position = new PositionType();
 					position.setCol(j);
 					position.setRow(i);
 					return position;
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	public boolean equals(Object other) {
-		if(this == other)
+		if (this == other)
 			return true;
-		if(other == null)
+		if (other == null)
 			return false;
-		
-		if(!BoardType.class.isAssignableFrom(other.getClass())) 
+
+		if (!BoardType.class.isAssignableFrom(other.getClass()))
 			return false;
-		
+
 		Board board = (Board) other;
-		if(!this.getShiftCard().equals(board.getShiftCard()) || 
-				!this.getTreasure().equals(board.getTreasure()) || 
-				!this.getTreasurePos().equals(board.getTreasurePos()))
+		if (!this.getShiftCard().equals(board.getShiftCard())
+				|| !this.getTreasure().equals(board.getTreasure())
+				|| !this.getTreasurePos().equals(board.getTreasurePos()))
 			return false;
-		
-		for(int i = 0; i < getRow().size(); i++) {
-			for(int j = 0; j < getRow().get(i).getCol().size(); j++) {
-				if(!this.getCard(i, j).equals(board.getCard(i, j)))
+
+		for (int i = 0; i < getRow().size(); i++) {
+			for (int j = 0; j < getRow().get(i).getCol().size(); j++) {
+				if (!this.getCard(i, j).equals(board.getCard(i, j)))
 					return false;
 			}
 		}
-		
+
 		return true;
 	}
 }

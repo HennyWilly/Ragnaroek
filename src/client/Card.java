@@ -224,15 +224,27 @@ public class Card extends CardType {
 		}
 	}
 
+	/**
+	 * Returns a new card which represents the current card, rotated by an angle
+	 * of 90 degrees.
+	 * 
+	 * @return new rotated card instance
+	 */
 	public Card rotateClockwise() {
 		Orientation current = getOrientation();
 		Orientation rotated = Orientation.fromValue((current.value + 90) % 360);
 
 		return new Card(getShape(), rotated, getTreasure());
 	}
-	
+
+	/**
+	 * Returns the amount of different orientations, which could be made with
+	 * the current card shape.
+	 * 
+	 * @return number of different orientations
+	 */
 	public int getDifferentRotationCount() {
-		switch(this.getShape()) {
+		switch (this.getShape()) {
 		case I:
 			return 2;
 		case L:

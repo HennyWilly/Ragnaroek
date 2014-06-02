@@ -54,21 +54,46 @@ public class SimpleAI implements AI {
 		return positions.toArray(new Position[positions.size()]);
 	}
 
+	/**
+	 * Executes probing on a clone of the current board with all possible
+	 * shift-positions until it finds an appropriate one that creates a viable
+	 * path to a position within the specified radius to the treasure or
+	 * preserves an already existing one. This method calls itself recursivly,
+	 * until the specified radius reaches the specified maximal radius.
+	 * 
+	 * @param board
+	 *            current board
+	 * @param playerID
+	 *            current player ID
+	 * @param playerPos
+	 *            current player position
+	 * @param targetPos
+	 *            current wanted card position
+	 * @param radius
+	 *            distance of the target position to the treasure
+	 * @param maxRadius
+	 *            maximum distance to limit recursive calls
+	 * @return a move-message that either creates a viable path to a position
+	 *         within a radius to the treasure or preserves an already existing
+	 *         one in case of solveability.
+	 */
 	private MoveMessageType getAppropriateRadiusMove(Board board, int playerID,
 			PositionType playerPos, PositionType targetPos, int radius,
 			int maxRadius) {
+		ArrayList<MoveMessageType> possibleMoves = new ArrayList<MoveMessageType>();
+
 		PositionType forbiddenPos = board.getForbidden();
 		Card shiftCard = new Card(board.getShiftCard());
 
 		Position probeShiftPos = null;
+		Position shiftedWanted = null;
 		Board shadowBoard;
 
 		boolean samePos = false;
 
-		MoveMessageType move = new MoveMessageType();
+		MoveMessageType move = null;
 
-		Position[] radiusPositions = getRadiusPositions(targetPos,
-				radius);
+		Position[] radiusPositions = getRadiusPositions(targetPos, radius);
 		for (Position wanted : radiusPositions) {
 			if (wanted.equals(playerPos)) {
 				// Break if current position is the same as the wanted position
@@ -83,19 +108,21 @@ public class SimpleAI implements AI {
 					if (probeShiftPos.equals(forbiddenPos))
 						continue;
 
-					for (int k = 0; k < shiftCard.getDifferentRotationCount(); k++) {					
+					shiftedWanted = wanted.getPositionAfterShift(probeShiftPos);
+					if (shiftedWanted == null)
+						continue;
+
+					for (int k = 0; k < shiftCard.getDifferentRotationCount(); k++) {
+						move = new MoveMessageType();
 						move.setShiftPosition(probeShiftPos);
-						move.setNewPinPos(wanted);
+						move.setNewPinPos(shiftedWanted);
 						move.setShiftCard(shiftCard);
 
-						// FIXME
-						// Not sure, if complete or not
 						shadowBoard = (Board) board.clone();
 						if (shadowBoard.validateTransition(move, playerID)) {
 							if (radius > 0
 									|| shadowBoard.proceedTurn(move, playerID)) {
-								// Use probeShiftPos as shiftPosition
-								return move;
+								possibleMoves.add(move);
 							}
 						}
 
@@ -105,12 +132,18 @@ public class SimpleAI implements AI {
 			}
 		}
 
+		if (possibleMoves.size() > 0) {
+			// randomly select one possible move to avoid selecting (row = 0,
+			// col = 1) as shift position if there is already an existing path
+
+			return possibleMoves.get(rand.nextInt(possibleMoves.size()));
+		}
+
 		if (!samePos && radius < maxRadius)
 			return getAppropriateRadiusMove(board, playerID, playerPos,
 					targetPos, radius + 1, maxRadius);
 
-		move.setShiftPosition(null);
-		return move;
+		return new MoveMessageType();
 	}
 
 	/**
@@ -123,28 +156,28 @@ public class SimpleAI implements AI {
 	 * 
 	 * @param board
 	 *            current board
+	 * @param playerID
+	 *            current player ID
 	 * @param playerPos
 	 *            current player position
 	 * @param wantedCardPos
 	 *            current wanted card position
-	 * @return a shift-position that either creates a viable path to the
-	 *         treasure or preserves an already existing one in case of
-	 *         solveability
+	 * @return a move-message that either creates a viable path to the treasure
+	 *         or preserves an already existing one in case of solveability.
 	 */
 	private MoveMessageType getAppropriateMove(Board board, int playerID,
-			PositionType playerPos) {
+			Position playerPos) {
 		PositionType forbiddenPos = board.getForbidden();
 		MoveMessageType message = null;
 
 		PositionType treasurePos = board.getTreasurePos();
 		if (treasurePos == null) {
-			// TODO Treasure on ShiftCard
-
-			int radius = 0;
+			// Treasure on shift card
 			
-			outer:
-			while (radius <= 6) {
-				Position probeShiftPos = null;
+			Position probeShiftPos = null;
+
+			outer: 
+			for(int radius = 0; radius <= 6; radius++) {
 				for (int i = 1; i < 6; i += 2) {
 					for (int j = 0; j < 4; j++) {
 						probeShiftPos = Position.getValidShiftPos(i, j);
@@ -152,14 +185,13 @@ public class SimpleAI implements AI {
 						if (probeShiftPos.equals(forbiddenPos))
 							continue;
 
-						// FIXME Still buggy
 						message = getAppropriateRadiusMove(board, playerID,
 								playerPos, probeShiftPos, radius, radius);
-						break outer;
+
+						if (message.getShiftPosition() != null)
+							break outer;
 					}
 				}
-				
-				radius++;
 			}
 		} else {
 			message = getAppropriateRadiusMove(board, playerID, playerPos,
@@ -167,15 +199,21 @@ public class SimpleAI implements AI {
 		}
 
 		if (message.getShiftPosition() == null) {
+			Position shiftPos = null;
+			Position shiftedPlayerPos = null;
+
 			int index;
 			int side;
 			do {
 				index = 2 * rand.nextInt(3) + 1; // ->1,3,5
 				side = rand.nextInt(4); // ->0,1,2,3
 
-				message.setShiftPosition(Position.getValidShiftPos(index, side));
-			} while (message.getShiftPosition().equals(forbiddenPos));
-			message.setNewPinPos(playerPos);
+				shiftPos = Position.getValidShiftPos(index, side);
+				shiftedPlayerPos = playerPos.getPinPositionAfterShift(shiftPos);
+			} while (shiftPos.equals(forbiddenPos));
+
+			message.setShiftPosition(shiftPos);
+			message.setNewPinPos(shiftedPlayerPos);
 			message.setShiftCard(board.getShiftCard());
 		}
 
@@ -185,12 +223,9 @@ public class SimpleAI implements AI {
 	@Override
 	public MoveMessageType move(int playerID, AwaitMoveMessageType data) {
 		Board board = new Board(data.getBoard(), data.getTreasure());
-		PositionType playerPos = board.findPlayer(playerID);
+		Position playerPos = board.findPlayer(playerID);
 		MoveMessageType move = this.getAppropriateMove(board, playerID,
 				playerPos);
-		if (!board.validateTransition(move, playerID)) {
-			System.out.println("Oops, da klappt was nicht");
-		}
 
 		return move;
 	}
