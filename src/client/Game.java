@@ -40,6 +40,10 @@ public class Game {
 			break;
 		}
 	}
+	
+	int getID() {
+		return clientID;
+	}
 
 	public Game(String name, String host, int port) throws IOException {
 		this(name, new Socket(host, port));
@@ -50,7 +54,7 @@ public class Game {
 		return connection.receiveMessage();
 	}
 
-	public boolean solve(AI solver) {
+	public int solve(AI solver) {
 		MazeCom msg = null;
 
 		do {
@@ -73,7 +77,7 @@ public class Game {
 						clientID, move));
 				if (result == null) {
 					System.err.println("Verbindung zum Server unterbrochen");
-					return false;
+					return -1;
 				}
 
 				MazeComType type = result.getMcType();
@@ -97,11 +101,11 @@ public class Game {
 				System.out.format("Grund: %s\n", msg.getDisconnectMessage()
 						.getErroCode());
 
-				return false;
+				return -1;
 			}
 		} while (msg.getMcType() != MazeComType.WIN);
 
 		WinMessageType winMessage = msg.getWinMessage();
-		return winMessage.getWinner().getId() == clientID;
+		return winMessage.getWinner().getId();
 	}
 }

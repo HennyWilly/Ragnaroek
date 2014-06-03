@@ -4,31 +4,27 @@ import generated.PositionType;
 
 public class Position extends PositionType {
 
-	public Position() {
-		super();
-		row = -1;
-		col = -1;
-	}
-
 	public Position(PositionType p) {
-		super();
-		row = p.getRow();
-		col = p.getCol();
+		this(p.getRow(), p.getCol());
 	}
 
 	public Position(int row, int col) {
+		if (row < 0 || row > 6)
+			throw new IllegalArgumentException("Invalid index for row");
+		if (col < 0 || col > 6)
+			throw new IllegalArgumentException("Invalid index for column");
+
 		this.row = row;
 		this.col = col;
 	}
 
-	// checkt ob an dieser Stelle ein Schieben moeglich ist
-	public boolean isLoosePosition() {
+	// checkt ob an dieser Stelle ein Einschieben moeglich ist
+	public boolean isInsertablePosition() {
 		return ((row % 6 == 0 && col % 2 == 1) || (col % 6 == 0 && row % 2 == 1));
 	}
 
 	public boolean isOppositePosition(PositionType otherPosition) {
-		Position op = new Position(otherPosition);
-		return this.getOpposite().equals(op);
+		return this.getOpposite().equals(otherPosition);
 	}
 
 	// gibt die gegenueberliegende
@@ -89,32 +85,33 @@ public class Position extends PositionType {
 		if (side < 0 || side >= 4)
 			throw new IllegalArgumentException("Invalid side of board");
 
-		Position probeShiftPos = new Position();
+		int col = -1;
+		int row = -1;
 
 		switch (side) {
 		// Top
 		case 0:
-			probeShiftPos.setCol(index);
-			probeShiftPos.setRow(0);
+			col = index;
+			row = 0;
 			break;
 		// Left
 		case 1:
-			probeShiftPos.setCol(0);
-			probeShiftPos.setRow(index);
+			col = 0;
+			row = index;
 			break;
 		// Bottom
 		case 2:
-			probeShiftPos.setCol(index);
-			probeShiftPos.setRow(6);
+			col = index;
+			row = 6;
 			break;
 		// Right
 		case 3:
-			probeShiftPos.setCol(6);
-			probeShiftPos.setRow(index);
+			col = 6;
+			row = index;
 			break;
 		}
 
-		return probeShiftPos;
+		return new Position(row, col);
 	}
 
 	/**
@@ -128,22 +125,36 @@ public class Position extends PositionType {
 	 *         on the board
 	 */
 	public Position getPositionAfterShift(Position shiftPos) {
-		int col = this.getCol();
-		int row = this.getRow();
-		if (col % 2 != 1 && row % 2 != 1)
+		if (!isLoosePosition())
 			return new Position(this);
 
+		int col = this.getCol();
+		int row = this.getRow();
 		int shiftCol = shiftPos.getCol();
 		int shiftRow = shiftPos.getRow();
 
 		if (shiftCol % 6 == 0 && row == shiftRow) {
 			// Shiftcard inserted left or right
-			col += Math.signum(col - shiftCol);
+			if (col == shiftCol) {
+				if (col == 0)
+					col++;
+				else
+					col--;
+			} else {
+				col += Math.signum(col - shiftCol);
+			}
 			if (col > 6 || col < 0)
 				return null;
 		} else if (shiftRow % 6 == 0 && col == shiftCol) {
 			// Shiftcard inserted at top or bottom
-			row += Math.signum(row - shiftRow);
+			if (row == shiftRow) {
+				if (row == 0)
+					row++;
+				else
+					row--;
+			} else {
+				row += Math.signum(row - shiftRow);
+			}
 			if (row > 6 || row < 0)
 				return null;
 		}
@@ -170,4 +181,7 @@ public class Position extends PositionType {
 		return newPos;
 	}
 
+	public boolean isLoosePosition() {
+		return col % 2 == 1 || row % 2 == 1;
+	}
 }

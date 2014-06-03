@@ -74,7 +74,10 @@ public class Main {
 				.getSimpleName());
 
 		Game game = new Game(name, sock);
-		if (game.solve(solver))
+		int gameResult = game.solve(solver);
+		if(gameResult == game.getID())			
 			System.out.println("Congratz");
+		else if(gameResult >= 1)
+			System.out.format("gg to player %d\n", gameResult);
 	}
 }

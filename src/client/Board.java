@@ -12,6 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Board extends BoardType {
+	public static final Position[] SHIFTPOSITIONS;
+	static {
+		List<Position> list = new ArrayList<Position>(12);
+		
+		for (int i = 1; i < 6; i += 2) {
+			for (int j = 0; j < 4; j++) {
+				list.add(Position.getValidShiftPos(i, j));
+			}
+		}
+		
+		SHIFTPOSITIONS = list.toArray(new Position[list.size()]);
+	}
+	
 	private TreasureType currentTreasure;
 
 	public Board(BoardType old, TreasureType treasure) {
@@ -27,7 +40,7 @@ public class Board extends BoardType {
 			}
 		}
 	}
-	
+
 	protected void setCard(int row, int col, Card c) {
 		// Muss ueberschrieben werden, daher zuerst entfernen und dann...
 		this.getRow().get(row).getCol().remove(col);
@@ -102,18 +115,24 @@ public class Board extends BoardType {
 		// XXX ACHTUNG wird nicht mehr auf Richtigkeit ueberprueft!!!
 		this.proceedShift(move);
 		Position target = new Position(move.getNewPinPos());
-		movePlayer(findPlayer(currPlayer), target, currPlayer);
+		movePlayer(target, currPlayer);
 		Card c = new Card(getCard(target.getRow(), target.getCol()));
 		return (c.getTreasure() == currentTreasure);
 
 	}
 
-	protected void movePlayer(PositionType oldPos, PositionType newPos,
-			Integer playerID) {
+	public boolean movePlayer(PositionType newPos, Integer playerID) {
+		Position oldPos = findPlayer(playerID);
+		
+		if(!pathpossible(oldPos, newPos))
+			return false;
+		
 		getCard(oldPos.getRow(), oldPos.getCol()).getPin().getPlayerID()
 				.remove(playerID);
 		getCard(newPos.getRow(), newPos.getCol()).getPin().getPlayerID()
 				.add(playerID);
+		
+		return true;
 	}
 
 	public Board fakeShift(MoveMessageType move) {
@@ -148,7 +167,7 @@ public class Board extends BoardType {
 		// Ueberpruefen ob das Reinschieben der Karte gueltig ist
 
 		Position sm = new Position(move.getShiftPosition());
-		if (!sm.isLoosePosition() || sm.equals(forbidden)) {
+		if (!sm.isInsertablePosition() || sm.equals(forbidden)) {
 			System.err.println("Warning: verbotene Position der Schiebekarte");
 			return false;
 		}
@@ -244,10 +263,7 @@ public class Board extends BoardType {
 				Pin pinsOnCard = getCard(i, j).getPin();
 				for (Integer pin : pinsOnCard.getPlayerID()) {
 					if (pin == PlayerID) {
-						Position pos = new Position();
-						pos.setCol(j);
-						pos.setRow(i);
-						return pos;
+						return new Position(i, j);
 					}
 				}
 			}
@@ -261,13 +277,12 @@ public class Board extends BoardType {
 		return currentTreasure;
 	}
 
-	public PositionType getTreasurePos() {
+	public Position getTreasurePos() {
 		List<Row> rows = getRow();
 		List<CardType> cols;
 		Row row;
 		CardType card;
 		TreasureType cardTreasure;
-		PositionType position;
 
 		for (int i = 0; i < rows.size(); i++) {
 			row = rows.get(i);
@@ -276,11 +291,8 @@ public class Board extends BoardType {
 				card = cols.get(j);
 				cardTreasure = card.getTreasure();
 				if (cardTreasure != null
-						&& cardTreasure.equals(currentTreasure)) {
-					position = new PositionType();
-					position.setCol(j);
-					position.setRow(i);
-					return position;
+						&& cardTreasure.equals(getTreasure())) {
+					return new Position(i, j);
 				}
 			}
 		}
@@ -311,5 +323,9 @@ public class Board extends BoardType {
 		}
 
 		return true;
+	}
+	
+	public Card getCard(PositionType pos) {
+		return getCard(pos.getRow(), pos.getCol());
 	}
 }
