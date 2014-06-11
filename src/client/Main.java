@@ -7,11 +7,11 @@ import ai.AI;
 import ai.SimpleAI;
 
 public class Main {
-	public static final String NAME = "Ragnarök";
+	public static final String NAME = "Ragnaroek";
 
 	/**
 	 * Parst die uebergebenen Argumente und gibt, falls erfolgreich, einen Socket
-	 * zum Server zurück
+	 * zum Server zurueck
 	 * 
 	 * @param args
 	 *            Zu parsende Argumente
@@ -47,13 +47,13 @@ public class Main {
 	}
 
 	/**
-	 * Gibt den Typ der benötigten Kommandozeilenparameter auf der Konsole aus.
+	 * Gibt den Typ der benoetigten Kommandozeilenparameter auf der Konsole aus.
 	 */
 	private static void showHelp() {
 		System.out
 				.println("Es werden genau 2 Kommandozeilenargumente benoetigt");
 		System.out.println("Hostname: Name oder IP-Adresse des Servers");
-		System.out.println("Port: Portnummer die vom Server überwacht wird");
+		System.out.println("Port: Portnummer die vom Server ueberwacht wird");
 	}
 
 	/**

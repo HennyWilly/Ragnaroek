@@ -242,7 +242,7 @@ public class SimpleAI implements AI {
 	private MoveMessageType getAppropriateMove(Board board, int playerID,
 			Position playerPos) {
 		PositionType forbiddenPos = board.getForbidden();
-		MoveMessageType message = null;
+		MoveMessageType message = new MoveMessageType();
 
 		Position treasurePos = board.getTreasurePos();
 		if (treasurePos == null) {
