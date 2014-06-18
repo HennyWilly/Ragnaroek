@@ -66,13 +66,6 @@ public class Game {
 				// Errechne Zug aus Spielfeld-Daten
 				MoveMessageType move = solver.move(clientID, awaitMove);
 
-				// TODO remove dummy check
-				Board board = new Board(awaitMove.getBoard(),
-						awaitMove.getTreasure());
-				if (!board.validateTransition(move, clientID)) {
-					System.out.println("Oops, da klappt was nicht");
-				}
-
 				MazeCom result = sendMessage(factory.createMoveMessage(
 						clientID, move));
 				if (result == null) {

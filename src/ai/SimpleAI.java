@@ -95,18 +95,6 @@ public class SimpleAI implements AI {
 				// shadowBoard !!!
 				shadowBoard.proceedTurn(move, playerID);
 
-				// TODO remove
-				Position playerPos = shadowBoard.findPlayer(playerID);
-				Position treasurePos = shadowBoard.getTreasurePos();
-				if (!playerPos.equals(treasurePos)) {
-					if (shadowBoard.pathpossible(treasurePos, playerPos)) {
-						// check if there is an ignored way to the
-						// treasure
-						String tmp = "";
-						tmp = tmp.intern();
-					}
-				}
-
 				possibleMoves.put(move, shadowBoard);
 			}
 
@@ -208,9 +196,6 @@ public class SimpleAI implements AI {
 					return moveEntry;
 				i++;
 			}
-
-			// TODO remove dummy exception
-			throw new RuntimeException();
 		}
 
 		if (!samePos && radius < maxRadius)
@@ -302,20 +287,6 @@ public class SimpleAI implements AI {
 		Position playerPos = board.findPlayer(playerID);
 		MoveMessageType move = this.getAppropriateMove(board, playerID,
 				playerPos);
-
-		// TODO remove
-		Board dummyBoard = (Board)board.clone();
-		dummyBoard.proceedTurn(move, playerID);
-		playerPos = dummyBoard.findPlayer(playerID);
-		Position treasurePos = dummyBoard.getTreasurePos();
-		if (!playerPos.equals(treasurePos)) {
-			if (dummyBoard.pathpossible(treasurePos, playerPos)) {
-				// check if there is an ignored way to the
-				// treasure
-				String tmp = "";
-				tmp = tmp.intern();
-			}
-		}
 
 		return move;
 	}

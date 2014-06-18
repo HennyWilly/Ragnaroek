@@ -7,7 +7,7 @@ import ai.AI;
 import ai.SimpleAI;
 
 public class Main {
-	public static final String NAME = "Ragnaroek";
+	public static final String NAME = "Kopierpastete";
 
 	/**
 	 * Parst die uebergebenen Argumente und gibt, falls erfolgreich, einen Socket
@@ -70,10 +70,8 @@ public class Main {
 			return;
 
 		AI solver = new SimpleAI();
-		String name = String.format("%s.%s", NAME, solver.getClass()
-				.getSimpleName());
-
-		Game game = new Game(name, sock);
+		
+		Game game = new Game(NAME, sock);
 		int gameResult = game.solve(solver);
 		if(gameResult == game.getID())			
 			System.out.println("Congratz");
